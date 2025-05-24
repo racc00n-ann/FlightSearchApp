@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Favorite
@@ -38,6 +39,17 @@ import com.example.flightsearch.data.database.entity.Airport
 import com.example.flightsearch.data.database.entity.Favorite
 import com.example.flightsearch.data.model.Flight
 import com.example.flightsearch.ui.viewmodels.FlightSearchUiState
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarOutline
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.material.icons.filled.FlightTakeoff
+import androidx.compose.material.icons.filled.FlightLand
+import androidx.compose.material.icons.filled.ArrowDownward
+import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.size
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,7 +64,11 @@ fun FlightSearchScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Flight Search") }
+                title = {
+                    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                        Text("Flight Search")
+                    }
+                }
             )
         }
     ) { innerPadding ->
@@ -68,9 +84,9 @@ fun FlightSearchScreen(
                 onClearSearch = onClearSearch,
                 modifier = Modifier.fillMaxWidth()
             )
-            
+
             Spacer(modifier = Modifier.height(16.dp))
-            
+
             when {
                 uiState.selectedAirport != null -> {
                     FlightsList(
@@ -111,14 +127,25 @@ fun SearchBar(
         trailingIcon = {
             if (query.isNotEmpty()) {
                 IconButton(onClick = onClearSearch) {
-                    Icon(Icons.Default.Clear, contentDescription = "Clear")
+                    Icon(
+                        Icons.Default.Clear,
+                        contentDescription = "Clear",
+                        tint = Color.Red // Красный цвет для кнопки очистки
+                    )
                 }
             }
         },
+        shape = RoundedCornerShape(20.dp),
+        colors = TextFieldDefaults.colors(
+            unfocusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+        ),
         modifier = modifier
+            .shadow(2.dp, RoundedCornerShape(20.dp))
     )
 }
 
+// Остальной код остается без изменений
 @Composable
 fun AirportSuggestions(
     airports: List<Airport>,
@@ -131,16 +158,16 @@ fun AirportSuggestions(
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold
         )
-        
+
         Spacer(modifier = Modifier.height(8.dp))
-        
+
         LazyColumn {
             items(airports) { airport ->
                 AirportItem(
                     airport = airport,
                     onClick = { onAirportSelected(airport) }
                 )
-                Divider()
+                HorizontalDivider(thickness = 0.5.dp)
             }
         }
     }
@@ -192,22 +219,26 @@ fun FlightsList(
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold
         )
-        
+
         Spacer(modifier = Modifier.height(8.dp))
-        
+
         LazyColumn {
             items(flights) { flight ->
-                val isFavorite = favorites.any { 
-                    it.departure_code == flight.departureCode && 
-                    it.destination_code == flight.destinationCode 
+                val isFavorite = favorites.any {
+                    it.departure_code == flight.departureCode &&
+                            it.destination_code == flight.destinationCode
                 }
-                
+
                 FlightItem(
                     flight = flight,
                     isFavorite = isFavorite,
                     onToggleFavorite = { onToggleFavorite(flight) }
                 )
-                Divider()
+                HorizontalDivider(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    thickness = 0.5.dp,
+                    color = MaterialTheme.colorScheme.outlineVariant
+                )
             }
         }
     }
@@ -250,21 +281,24 @@ fun FlightItem(
                         fontWeight = FontWeight.Bold
                     )
                 }
-                
+
                 Spacer(modifier = Modifier.height(4.dp))
-                
+
                 Text(
                     text = flight.destinationName,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-            
+
             IconButton(onClick = onToggleFavorite) {
                 Icon(
-                    imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                    imageVector = if (isFavorite) Icons.Default.Star else Icons.Default.StarOutline,
                     contentDescription = if (isFavorite) "Remove from favorites" else "Add to favorites",
-                    tint = if (isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                    tint = if (isFavorite)
+                        Color(0xFFFFC107) // Ярко-желтый
+                    else
+                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                 )
             }
         }
@@ -282,9 +316,9 @@ fun FavoritesList(
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold
         )
-        
+
         Spacer(modifier = Modifier.height(8.dp))
-        
+
         if (favorites.isEmpty()) {
             Box(
                 modifier = Modifier
@@ -302,7 +336,7 @@ fun FavoritesList(
             LazyColumn {
                 items(favorites) { favorite ->
                     FavoriteItem(favorite = favorite)
-                    Divider()
+                    HorizontalDivider(thickness = 0.5.dp)
                 }
             }
         }
@@ -321,9 +355,9 @@ fun FavoriteItem(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
-            imageVector = Icons.Default.Favorite,
+            imageVector = Icons.Default.Star,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
+            tint = Color(0xFFFFC107), // Желтый цвет как в FlightItem
             modifier = Modifier.padding(end = 16.dp)
         )
         Row {

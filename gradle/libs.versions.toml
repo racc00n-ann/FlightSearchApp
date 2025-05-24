@@ -1,5 +1,5 @@
 [versions]
-agp = "8.8.0"
+agp = "8.10.0"
 datastorePreferences = "1.1.6"
 javaxInject = "1"
 kotlin = "2.0.0"

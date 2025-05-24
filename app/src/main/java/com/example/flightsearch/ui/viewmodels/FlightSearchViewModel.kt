@@ -1,7 +1,6 @@
 package com.example.flightsearch.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.flightsearch.data.database.entity.Airport
 import com.example.flightsearch.data.database.entity.Favorite
@@ -16,7 +15,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-
 
 class FlightSearchViewModel(
     private val flightRepository: FlightRepository,
@@ -77,7 +75,7 @@ class FlightSearchViewModel(
         _searchQuery.value = query
         _selectedAirport.value = null
         _flights.value = emptyList()
-        
+
         viewModelScope.launch {
             userPreferencesRepository.saveSearchQuery(query)
         }
@@ -100,13 +98,12 @@ class FlightSearchViewModel(
         _searchQuery.value = ""
         _selectedAirport.value = null
         _flights.value = emptyList()
-        
+
         viewModelScope.launch {
             userPreferencesRepository.saveSearchQuery("")
         }
     }
 }
-
 
 data class FlightSearchUiState(
     val searchQuery: String = "",
@@ -115,17 +112,3 @@ data class FlightSearchUiState(
     val flights: List<Flight> = emptyList(),
     val favorites: List<Favorite> = emptyList()
 )
-
-class FlightSearchViewModelFactory(
-    private val flightRepository: FlightRepository,
-    private val userPreferencesRepository: UserPreferencesRepository
-) : ViewModelProvider.Factory {
-    
-    @Suppress("UNCHECKED_CAST")
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(FlightSearchViewModel::class.java)) {
-            return FlightSearchViewModel(flightRepository, userPreferencesRepository) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
-    }
-}

@@ -13,7 +13,7 @@ import com.example.flightsearch.ui.theme.FlightSearchTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+// Получаем контейнер зависимостей из Application-класса
         val appContainer = (application as FlightSearchApplication).container
         
         setContent {
@@ -22,7 +22,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    FlightSearchApp(appContainer)
+                    FlightSearchApp(appContainer) // Запускаем основное приложение, передавая контейнер
                 }
             }
         }
