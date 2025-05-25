@@ -50,7 +50,6 @@ class FlightRepositoryImpl(
         val isFavorite = favoriteDao.isFavorite(flight.departureCode, flight.destinationCode).firstOrNull() ?: false
 
         if (isFavorite) {
-
             favoriteDao.deleteFavoriteByRoute(flight.departureCode, flight.destinationCode)
         } else {
             val favorite = Favorite(
