@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.flightsearch.data.AppContainer
+import com.example.flightsearch.di.AppContainer
 import com.example.flightsearch.ui.screens.FlightSearchScreen
 import com.example.flightsearch.ui.viewmodels.FlightSearchViewModel
 import com.example.flightsearch.ui.viewmodels.FlightSearchViewModelFactory

@@ -15,13 +15,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -39,16 +36,11 @@ import com.example.flightsearch.data.database.entity.Airport
 import com.example.flightsearch.data.database.entity.Favorite
 import com.example.flightsearch.data.model.Flight
 import com.example.flightsearch.ui.viewmodels.FlightSearchUiState
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarOutline
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.material.icons.filled.FlightTakeoff
-import androidx.compose.material.icons.filled.FlightLand
-import androidx.compose.material.icons.filled.ArrowDownward
-import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.size
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -104,7 +96,17 @@ fun FlightSearchScreen(
                 }
                 else -> {
                     FavoritesList(
-                        favorites = uiState.favorites
+                        favorites = uiState.favorites,
+                        onRemoveFavorite = { favorite ->
+                            onToggleFavorite(
+                                Flight(
+                                    departureCode = favorite.departure_code,
+                                    departureName = "",
+                                    destinationCode = favorite.destination_code,
+                                    destinationName = ""
+                                )
+                            )
+                        }
                     )
                 }
             }
@@ -130,7 +132,7 @@ fun SearchBar(
                     Icon(
                         Icons.Default.Clear,
                         contentDescription = "Clear",
-                        tint = Color.Red // Красный цвет для кнопки очистки
+                        tint = Color.Red
                     )
                 }
             }
@@ -145,7 +147,6 @@ fun SearchBar(
     )
 }
 
-// Остальной код остается без изменений
 @Composable
 fun AirportSuggestions(
     airports: List<Airport>,
@@ -167,7 +168,6 @@ fun AirportSuggestions(
                     airport = airport,
                     onClick = { onAirportSelected(airport) }
                 )
-                HorizontalDivider(thickness = 0.5.dp)
             }
         }
     }
@@ -234,11 +234,7 @@ fun FlightsList(
                     isFavorite = isFavorite,
                     onToggleFavorite = { onToggleFavorite(flight) }
                 )
-                HorizontalDivider(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    thickness = 0.5.dp,
-                    color = MaterialTheme.colorScheme.outlineVariant
-                )
+
             }
         }
     }
@@ -255,7 +251,11 @@ fun FlightItem(
         modifier = modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+        ),
+        elevation = CardDefaults.cardElevation()
     ) {
         Row(
             modifier = Modifier
@@ -265,30 +265,49 @@ fun FlightItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = flight.departureCode,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = " → ",
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                    Text(
-                        text = flight.destinationCode,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
+                   Column {
+                        Text(
+                            text = "DEPART",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                       Row(verticalAlignment = Alignment.Top) {
+                           Text(
+                               text = flight.departureCode,
+                               style = MaterialTheme.typography.bodyLarge,
+                               fontWeight = FontWeight.Bold
+                           )
+                           Text( text = "   ")
+                           Text(
+                               text = flight.departureName,
+                               style = MaterialTheme.typography.bodyMedium,
+                               color = MaterialTheme.colorScheme.onSurfaceVariant
+                           )
+                       }
+                    }
 
-                Spacer(modifier = Modifier.height(4.dp))
+                   Spacer(modifier = Modifier.height(12.dp))
+                   Column {
+                       Text(
+                           text = "ARRIVE",
+                           style = MaterialTheme.typography.labelMedium,
+                           color = MaterialTheme.colorScheme.onSurfaceVariant
+                       )
+                       Row(verticalAlignment = Alignment.Top) {
+                           Text(
+                               text = flight.destinationCode,
+                               style = MaterialTheme.typography.bodyLarge,
+                               fontWeight = FontWeight.Bold
+                           )
+                           Text( text = "   ")
+                           Text(
+                               text = flight.destinationName,
+                               style = MaterialTheme.typography.bodyMedium,
+                               color = MaterialTheme.colorScheme.onSurfaceVariant
+                           )
+                       }
 
-                Text(
-                    text = flight.destinationName,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                   }
             }
 
             IconButton(onClick = onToggleFavorite) {
@@ -296,7 +315,7 @@ fun FlightItem(
                     imageVector = if (isFavorite) Icons.Default.Star else Icons.Default.StarOutline,
                     contentDescription = if (isFavorite) "Remove from favorites" else "Add to favorites",
                     tint = if (isFavorite)
-                        Color(0xFFFFC107) // Ярко-желтый
+                        Color(0xFFFFC107)
                     else
                         MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                 )
@@ -308,11 +327,12 @@ fun FlightItem(
 @Composable
 fun FavoritesList(
     favorites: List<Favorite>,
+    onRemoveFavorite: (Favorite) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
         Text(
-            text = "Favorite Routes",
+            text = "Favorite flights",
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold
         )
@@ -335,8 +355,10 @@ fun FavoritesList(
         } else {
             LazyColumn {
                 items(favorites) { favorite ->
-                    FavoriteItem(favorite = favorite)
-                    HorizontalDivider(thickness = 0.5.dp)
+                    FavoriteItem(
+                        favorite = favorite,
+                        onRemoveFavorite = { onRemoveFavorite(favorite) }
+                    )
                 }
             }
         }
@@ -346,35 +368,76 @@ fun FavoritesList(
 @Composable
 fun FavoriteItem(
     favorite: Favorite,
+    onRemoveFavorite: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Row(
+    Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically
+            .padding(vertical = 4.dp),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+        ),
+        elevation = CardDefaults.cardElevation()
     ) {
-        Icon(
-            imageVector = Icons.Default.Star,
-            contentDescription = null,
-            tint = Color(0xFFFFC107), // Желтый цвет как в FlightItem
-            modifier = Modifier.padding(end = 16.dp)
-        )
-        Row {
-            Text(
-                text = favorite.departure_code,
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                text = " → ",
-                style = MaterialTheme.typography.bodyLarge
-            )
-            Text(
-                text = favorite.destination_code,
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Bold
-            )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        Text(
+                            text = "DEPART",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Text(
+                            text = favorite.departure_code,
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        Text(
+                            text = "ARRIVE",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Text(
+                            text = favorite.destination_code,
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+            }
+
+            IconButton(
+                onClick = onRemoveFavorite,
+                modifier = Modifier.size(50.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Star,
+                    contentDescription = "Remove from favorites",
+                    tint = Color(0xFFFFC107)
+                )
+            }
         }
     }
 }

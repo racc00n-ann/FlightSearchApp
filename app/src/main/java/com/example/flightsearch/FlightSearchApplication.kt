@@ -1,8 +1,8 @@
 package com.example.flightsearch
 
 import android.app.Application
-import com.example.flightsearch.data.AppContainer
-import com.example.flightsearch.data.AppContainerImpl
+import com.example.flightsearch.di.AppContainer
+import com.example.flightsearch.di.AppContainerImpl
 
 class FlightSearchApplication : Application() {
 

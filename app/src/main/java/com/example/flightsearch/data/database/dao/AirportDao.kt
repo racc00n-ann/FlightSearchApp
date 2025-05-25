@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface AirportDao {
+
     @Query("SELECT * FROM airport WHERE name LIKE '%' || :query || '%' OR iata_code LIKE '%' || :query || '%' ORDER BY passengers DESC")
     fun searchAirports(query: String): Flow<List<Airport>>
 
@@ -22,4 +23,5 @@ interface AirportDao {
     ORDER BY (f.destination_code IS NOT NULL) DESC, a.passengers DESC
 """)
     suspend fun getPossibleDestinations(airportId: Int): List<Airport>
+
 }

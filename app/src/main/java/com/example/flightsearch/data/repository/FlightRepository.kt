@@ -14,6 +14,7 @@ interface FlightRepository {
     fun getAllFavorites(): Flow<List<Favorite>>
     fun isFavorite(departureCode: String, destinationCode: String): Flow<Boolean>
     suspend fun toggleFavorite(flight: Flight)
+
 }
 
 class FlightRepositoryImpl(

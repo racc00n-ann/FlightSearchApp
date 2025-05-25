@@ -47,7 +47,7 @@ class FlightSearchViewModel(
         _selectedAirport,
         _flights,
         _favorites
-    ) { query, suggestedAirports, selectedAirport, flights, favorites ->
+    ){ query, suggestedAirports, selectedAirport, flights, favorites ->
         FlightSearchUiState(
             searchQuery = query,
             suggestedAirports = suggestedAirports,
